@@ -1,25 +1,15 @@
 package escoba.modelo;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 /**
- * *       RRRRR    SSSSS    SSSSS
- *         R    R  S        S
- *         RRRRR    SSSS     SSSS
- *         R  R          S        S
- *         R    R   SSSSS     SSSSS
  *
  * Representa una baza del juego de la Escoba.
- * <p>Una baza es el conjunto de cartas retiradas de la mesa junto con la carta
+ * <p>Una baza es el conjunto de cartas retiradas (ganadas que han sumado 15) de la mesa junto con la carta
  * jugada desde la mano del jugador. Puede marcarse como {@code escoba} si al
  * realizarla la mesa queda vacía.</p>
  *
- * <p>Las bazas se utilizan para el recuento final de puntos, ya que en ellas se
- * contabilizan los oros, los sietes y el siete de oros.</p>
- *
+ * 
  * @author Ricardo Sevilla Soba
- * @version 1.0
+ * @version 1.3
  * @since 2025-10-16
  */
 public class Baza {
@@ -27,7 +17,7 @@ public class Baza {
     /** Cartas que forman parte de la baza. */
     private Carta[] cartas;
 
-    /** Indica si la baza fue conseguida con una escoba (mesa vacía). */
+    /** Indica si la baza fue conseguida como una escoba y queda la mesa vacía. */
     private boolean fueEscoba;
 
     /**
@@ -44,46 +34,51 @@ public class Baza {
      * @param carta la carta que se va a agregar a la baza
      */
     public void agregarCarta(Carta carta) {
-        Carta[] nuevo = Arrays.copyOf(cartas, cartas.length + 1);
+        Carta[] nuevo = new Carta[cartas.length + 1];
+        for (int i = 0; i < cartas.length; i++) {
+            nuevo[i] = cartas[i];
+        }
         nuevo[nuevo.length - 1] = carta;
         cartas = nuevo;
     }
 
     /**
      * Genera un clon profundo de esta baza.
-     * <p>Se crea un nuevo objeto {@code Baza} con una copia de las cartas y el
-     * mismo estado de {@code fueEscoba}. Esto evita que los cambios en la copia
-     * afecten al original.</p>
      *
      * @return una nueva {@code Baza} idéntica a la actual
      */
     public Baza clonar() {
         Baza clon = new Baza();
-        clon.cartas = Arrays.copyOf(this.cartas, this.cartas.length);
+        clon.cartas = new Carta[this.cartas.length];
+        for (int i = 0; i < this.cartas.length; i++) {
+            clon.cartas[i] = this.cartas[i];
+        }
         clon.fueEscoba = this.fueEscoba;
         return clon;
     }
 
     /**
      * Devuelve las cartas contenidas en esta baza.
-     * <p>Se devuelve una copia del array para proteger la encapsulación
-     * del objeto.</p>
      *
      * @return un nuevo array con las cartas de esta baza
      */
     public Carta[] consultarCartas() {
-        return Arrays.copyOf(cartas, cartas.length);
+        Carta[] copia = new Carta[cartas.length];
+        for (int i = 0; i < cartas.length; i++) {
+            copia[i] = cartas[i];
+        }
+        return copia;
     }
 
     /**
      * Cuenta el número de cartas del palo de oros en la baza.
-     * <p>Este valor se utiliza en el recuento de puntos al final del juego.</p>
      *
      * @return número de cartas del palo {@link Palo#OROS} en la baza
      */
     public int contarOros() {
         int contador = 0;
-        for (Carta c : cartas) {
+        for (int i = 0; i < cartas.length; i++) {
+            Carta c = cartas[i];
             if (c.palo() == Palo.OROS) {
                 contador++;
             }
@@ -92,15 +87,15 @@ public class Baza {
     }
 
     /**
-     * Cuenta el número de cartas con valor 7 en la baza.
-     * <p>Los sietes son relevantes en la puntuación final del juego.</p>
+     * Cuenta el número de cartas con puntuación 7 en la baza.
      *
-     * @return número de cartas con valor 7 en la baza
+     * @return número de cartas cuya puntuación es 7
      */
     public int contarSietes() {
         int contador = 0;
-        for (Carta c : cartas) {
-            if (c.clave() == 7) {
+        for (int i = 0; i < cartas.length; i++) {
+            Carta c = cartas[i];
+            if (c.puntuacion() == 7) {
                 contador++;
             }
         }
@@ -108,14 +103,14 @@ public class Baza {
     }
 
     /**
-     * Comprueba si la baza contiene el {@code siete de oros}, conocido como
-     * «guindis», que otorga un punto directo al jugador.
+     * Comprueba si la baza contiene el siete de oros.
      *
      * @return {@code true} si contiene el siete de oros, {@code false} en caso contrario
      */
     public boolean tieneSieteOros() {
-        for (Carta c : cartas) {
-            if (c.palo() == Palo.OROS && c.clave() == 7) {
+        for (int i = 0; i < cartas.length; i++) {
+            Carta c = cartas[i];
+            if (c.palo() == Palo.OROS && c.puntuacion() == 7) {
                 return true;
             }
         }
@@ -123,8 +118,7 @@ public class Baza {
     }
 
     /**
-     * Marca esta baza como una escoba, lo que significa que se consiguió
-     * dejando la mesa vacía.
+     * Marca esta baza como una escoba.
      */
     public void marcarEscoba() {
         this.fueEscoba = true;
@@ -140,27 +134,25 @@ public class Baza {
     }
 
     /**
-     * Calcula el código hash de esta baza.
-     * <p>Se basa en las cartas y en el estado {@code fueEscoba}, para garantizar
-     * la consistencia con {@link #equals(Object)}.</p>
+     * Calcula el código hash de esta baza sin usar {@code java.util.Objects}.
      *
      * @return el código hash correspondiente a esta baza
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(cartas);
-        result = prime * result + Objects.hash(fueEscoba);
-        return result;
+        int resultado = 1;
+        resultado = 31 * resultado + (fueEscoba ? 1 : 0);
+        for (int i = 0; i < cartas.length; i++) {
+            Carta c = cartas[i];
+            resultado = 31 * resultado + (c != null ? c.hashCode() : 0);
+        }
+        return resultado;
     }
 
     /**
      * Compara esta baza con otro objeto para determinar si son iguales.
-     * <p>Dos bazas son iguales si contienen las mismas cartas (en el mismo orden)
-     * y comparten el mismo estado de {@code fueEscoba}.</p>
      *
-     * @param obj el objeto a comparar con esta baza
+     * @param obj el objeto a comparar
      * @return {@code true} si ambas bazas son equivalentes, {@code false} en caso contrario
      */
     @Override
@@ -168,24 +160,36 @@ public class Baza {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        Baza otra = (Baza) obj;
+        if (this.fueEscoba != otra.fueEscoba || this.cartas.length != otra.cartas.length) {
             return false;
         }
-        Baza other = (Baza) obj;
-        return Arrays.equals(cartas, other.cartas) && fueEscoba == other.fueEscoba;
+        for (int i = 0; i < cartas.length; i++) {
+            if (!this.cartas[i].equals(otra.cartas[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
-     * Devuelve una representación textual de esta baza, incluyendo las cartas
-     * y si fue o no una escoba.
+     * Devuelve una representación textual de la baza.
      *
-     * @return una cadena de texto descriptiva de la baza
+     * @return texto con las cartas y el estado de escoba
      */
     @Override
     public String toString() {
-        return "Baza [cartas=" + Arrays.toString(cartas) + ", fueEscoba=" + fueEscoba + "]";
+        String s = "Baza [";
+        for (int i = 0; i < cartas.length; i++) {
+            s += String.valueOf(cartas[i]);
+            if (i < cartas.length - 1) {
+                s += ", ";
+            }
+        }
+        s += "] fueEscoba=" + fueEscoba;
+        return s;
     }
 }

@@ -1,33 +1,20 @@
 package escoba.modelo;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 /**
- * *       RRRRR    SSSSS    SSSSS
- *         R    R  S        S
- *         RRRRR    SSSS     SSSS
- *         R  R          S        S
- *         R    R   SSSSS     SSSSS
- *
  * Representa a un jugador del juego de la Escoba.
- * <p>Gestiona su nombre, las cartas que tiene en la mano y las bazas ganadas
- * durante la partida. Proporciona métodos para consultar estadísticas del
- * juego, como el número de escobas, oros o sietes obtenidos.</p>
- *
- * <p>Los métodos que devuelven arrays siempre retornan copias para evitar
- * modificaciones externas del estado interno.</p>
+ * <p>Gestiona su nombre, la mano de cartas y las bazas ganadas.
+ * Salvo error los arrays se manipulan sin utilizar clases del paquete {@code java.util}.</p>
  *
  * @author Ricardo Sevilla Soba
- * @version 1.0
+ * @version 1.3
  * @since 2025-10-16
  */
 public class Jugador {
 
-    /** Nombre del jugador (por ejemplo, "María" o "Juan"). */
+    /** Nombre del jugador. */
     private String nombre;
 
-    /** Cartas que el jugador tiene actualmente en la mano. */
+    /** Cartas que el jugador tiene actualmente en su mano. */
     private Carta[] mano;
 
     /** Conjunto de bazas ganadas por el jugador. */
@@ -35,7 +22,6 @@ public class Jugador {
 
     /**
      * Crea un nuevo jugador con el nombre indicado.
-     * La mano y las bazas comienzan vacías.
      *
      * @param nombre nombre del jugador
      */
@@ -48,7 +34,7 @@ public class Jugador {
     /**
      * Devuelve el nombre del jugador.
      *
-     * @return el nombre del jugador
+     * @return nombre del jugador
      */
     public String consultarNombre() {
         return nombre;
@@ -56,21 +42,23 @@ public class Jugador {
 
     /**
      * Devuelve una copia de las cartas que el jugador tiene en la mano.
-     * <p>Se devuelve una copia del array para mantener la encapsulación
-     * y evitar modificaciones externas.</p>
      *
-     * @return un nuevo array con las cartas de la mano
+     *
+     * @return copia de la mano
      */
     public Carta[] consultarMano() {
-        return Arrays.copyOf(mano, mano.length);
+        Carta[] copia = new Carta[mano.length];
+        for (int i = 0; i < mano.length; i++) {
+            copia[i] = mano[i];
+        }
+        return copia;
     }
 
     /**
-     * Devuelve las bazas ganadas por el jugador.
-     * <p>Realiza una copia profunda: se copia el array y se clona
-     * cada {@link Baza} individualmente.</p>
+     * Devuelve una copia profunda de las bazas ganadas por el jugador.
+     *<p> Con clonar, no utilizamos ni clone ni cloneable.
      *
-     * @return un nuevo array con las bazas ganadas
+     * @return copia de las bazas
      */
     public Baza[] consultarBazas() {
         Baza[] copia = new Baza[bazas.length];
@@ -81,27 +69,28 @@ public class Jugador {
     }
 
     /**
-     * Agrega una nueva baza ganada al historial del jugador.
-     * <p>Se guarda una copia de la baza para evitar modificaciones
-     * externas.</p>
+     * Añade una nueva baza ganada al jugador.
      *
-     * @param baza la baza ganada que se desea agregar
+     * @param baza baza que se va a agregar
      */
     public void agregarBaza(Baza baza) {
-        Baza[] nuevo = Arrays.copyOf(bazas, bazas.length + 1);
+        Baza[] nuevo = new Baza[bazas.length + 1];
+        for (int i = 0; i < bazas.length; i++) {
+            nuevo[i] = bazas[i];
+        }
         nuevo[nuevo.length - 1] = baza.clonar();
         bazas = nuevo;
     }
 
     /**
-     * Devuelve el número de bazas que fueron conseguidas con escoba.
+     * Cuenta las escobas realizadas por el jugador.
      *
-     * @return cantidad de escobas ganadas por el jugador
+     * @return número total de escobas, se muestran al final de la partida
      */
     public int consultarEscobas() {
         int contador = 0;
-        for (Baza b : bazas) {
-            if (b.fueEscoba()) {
+        for (int i = 0; i < bazas.length; i++) {
+            if (bazas[i].fueEscoba()) {
                 contador++;
             }
         }
@@ -109,57 +98,52 @@ public class Jugador {
     }
 
     /**
-     * Cuenta el número total de cartas que ha ganado el jugador
-     * en todas sus bazas.
+     * Cuenta el total de cartas ganadas, no de los puntos, si no de la cantidad total.
      *
-     * @return total de cartas ganadas
+     * @return número total de cartas
      */
     public int contarCartas() {
         int contador = 0;
-        for (Baza b : bazas) {
-            contador += b.consultarCartas().length;
+        for (int i = 0; i < bazas.length; i++) {
+            contador += bazas[i].consultarCartas().length;
         }
         return contador;
     }
 
     /**
-     * Cuenta el número total de cartas del palo de oros
-     * que ha ganado el jugador.
+     * Cuenta el número total de cartas del palo de oros ganadas.
      *
-     * @return número total de oros ganados
+     * @return número de oros
      */
     public int contarOros() {
         int contador = 0;
-        for (Baza b : bazas) {
-            contador += b.contarOros();
+        for (int i = 0; i < bazas.length; i++) {
+            contador += bazas[i].contarOros();
         }
         return contador;
     }
 
     /**
-     * Cuenta el número total de cartas con valor 7
-     * que ha ganado el jugador.
+     * Cuenta el número de cartas con puntuación 7 ganadas.
      *
-     * @return número total de sietes ganados
+     * @return número de sietes
      */
     public int contarSietes() {
         int contador = 0;
-        for (Baza b : bazas) {
-            contador += b.contarSietes();
+        for (int i = 0; i < bazas.length; i++) {
+            contador += bazas[i].contarSietes();
         }
         return contador;
     }
 
     /**
-     * Comprueba si el jugador ha conseguido el {@code siete de oros},
-     * conocido como "guindis", que otorga un punto directo.
+     * Nos informa si el jugador tiene el siete de oros.
      *
-     * @return {@code true} si el jugador tiene el siete de oros,
-     *         {@code false} en caso contrario
+     * @return {@code true} si posee el siete de oros
      */
     public boolean tieneSieteOros() {
-        for (Baza b : bazas) {
-            if (b.tieneSieteOros()) {
+        for (int i = 0; i < bazas.length; i++) {
+            if (bazas[i].tieneSieteOros()) {
                 return true;
             }
         }
@@ -167,92 +151,133 @@ public class Jugador {
     }
 
     /**
-     * Indica si el jugador se ha quedado sin cartas en la mano.
+     * Comprueba si el jugador no tiene ninguna carta en la mano.
      *
-     * @return {@code true} si la mano está vacía, {@code false} en caso contrario
+     * @return {@code true} si la mano está vacía
      */
     public boolean estaSinCartas() {
         return mano.length == 0;
     }
 
     /**
-     * Añade una carta a la mano del jugador, por ejemplo durante el reparto.
+     * Añade una carta a la mano del jugador.
      *
-     * @param carta carta a añadir a la mano
+     * @param carta carta a añadir
      */
     public void recibirCarta(Carta carta) {
-        Carta[] nuevo = Arrays.copyOf(mano, mano.length + 1);
+        Carta[] nuevo = new Carta[mano.length + 1];
+        for (int i = 0; i < mano.length; i++) {
+            nuevo[i] = mano[i];
+        }
         nuevo[nuevo.length - 1] = carta;
         mano = nuevo;
     }
 
     /**
-     * Elimina de la mano la carta jugada por el jugador.
+     * Elimina la carta jugada de la mano, el jugador seleeciona una para hacer baza o dejar en la mesa.
      *
-     * @param carta carta que se ha jugado y debe retirarse de la mano
+     * @param carta carta que se ha jugado
      */
     public void jugarCarta(Carta carta) {
         Carta[] nuevo = new Carta[mano.length - 1];
         int j = 0;
-        for (Carta c : mano) {
-            if (!c.equals(carta)) {
-                nuevo[j++] = c;
+        for (int i = 0; i < mano.length; i++) {
+            if (!mano[i].equals(carta)) {
+                nuevo[j] = mano[i];
+                j++;
             }
         }
         mano = nuevo;
     }
 
     /**
-     * Calcula el código hash del jugador, basado en su nombre,
-     * mano y bazas ganadas.
+     * Calcula el código hash del jugador sin usar {@code java.util}.
      *
-     * @return el código hash correspondiente al jugador
+     * @return código hash del jugador
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(bazas);
-        result = prime * result + Arrays.hashCode(mano);
-        result = prime * result + Objects.hash(nombre);
-        return result;
+        int resultado = 1;
+        resultado = 31 * resultado + (nombre != null ? nombre.hashCode() : 0);
+        for (int i = 0; i < mano.length; i++) {
+            if (mano[i] != null) {
+                resultado = 31 * resultado + mano[i].hashCode();
+            }
+        }
+        for (int i = 0; i < bazas.length; i++) {
+            if (bazas[i] != null) {
+                resultado = 31 * resultado + bazas[i].hashCode();
+            }
+        }
+        return resultado;
     }
 
     /**
-     * Compara este jugador con otro objeto para determinar si son iguales.
-     * <p>Dos jugadores son iguales si tienen el mismo nombre,
-     * las mismas cartas en mano y las mismas bazas ganadas.</p>
+     * Compara este jugador con otro objeto.
      *
-     * @param obj el objeto a comparar
-     * @return {@code true} si ambos jugadores son equivalentes,
-     *         {@code false} en caso contrario
+     * @param obj objeto a comparar
+     * @return {@code true} si ambos jugadores son iguales
      */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+            
+        }
+        Jugador otro = (Jugador) obj;
+
+        if (nombre == null) {
+            if (otro.nombre != null) {
+                return false;
+            }
+            
+        } else if (!nombre.equals(otro.nombre)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+
+        if (mano.length != otro.mano.length || bazas.length != otro.bazas.length) {
             return false;
         }
-        Jugador other = (Jugador) obj;
-        return Arrays.equals(bazas, other.bazas)
-                && Arrays.equals(mano, other.mano)
-                && Objects.equals(nombre, other.nombre);
+
+        for (int i = 0; i < mano.length; i++) {
+            if (!mano[i].equals(otro.mano[i])) {
+                return false;
+            }
+        }
+        
+        for (int i = 0; i < bazas.length; i++) {
+            if (!bazas[i].equals(otro.bazas[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
-     * Devuelve una representación textual del jugador,
-     * incluyendo su nombre, mano actual y bazas ganadas.
+     * Devuelve una representación textual del jugador.
      *
-     * @return una cadena descriptiva del jugador
+     * @return texto descriptivo del jugador
      */
     @Override
     public String toString() {
-        return "Jugador [nombre=" + nombre + ", mano=" + Arrays.toString(mano)
-                + ", bazas=" + Arrays.toString(bazas) + "]";
+        String s = "Jugador [nombre=" + nombre + ", mano=[";
+        for (int i = 0; i < mano.length; i++) {
+            s += String.valueOf(mano[i]);
+            if (i < mano.length - 1) {
+                s += ", ";
+            }
+        }
+        s += "], bazas=[";
+        for (int i = 0; i < bazas.length; i++) {
+            s += String.valueOf(bazas[i]);
+            if (i < bazas.length - 1) {
+                s += ", ";
+            }
+        }
+        s += "]]";
+        return s;
     }
 }
