@@ -88,35 +88,35 @@ public class Controlador {
     /**
      * Asigna las cartas que queden sobre la mesa al jugador que ganó la última baza.
      * <p>Estas cartas no cuentan como escoba. Si nadie ha ganado bazas (cosa complicada) o no hay cartas,
-     * el método no realiza ninguna acción y muestra el resultado final.</p>
+     * el método da las cartas de la mesa al primer jugador por defecto y muestra el resultado final.</p>
      */
     private void darCartasRestantes() {
-        if (ultimoGanador == null) {
-            return;
-        }
-
         Mesa mesa = partida.obtenerMesa();
-        List<Carta> resto = mesa.consultarCartasEnMesa();
+        java.util.List<Carta> resto = mesa.consultarCartasEnMesa();
 
         if (resto.isEmpty()) {
             return;
         }
 
         Baza baza = new Baza();
-        for (Carta element : resto) {
+        for (Carta carta : resto) {
             try {
-                baza.agregarCarta(element);
-            } catch (CartaExistenteException e) {
+                baza.agregarCarta(carta);
+            } catch (escoba.modelo.excepcion.CartaExistenteException e) {
                 throw new IllegalStateException("Error al agregar carta a la baza final", e);
             }
         }
 
-        ultimoGanador.agregarBaza(baza);
+        java.util.List<Jugador> jugadores = partida.obtenerJugadores();
+        Jugador destinatario = (ultimoGanador != null) ? ultimoGanador : jugadores.get(0);
 
-        for (Carta element : resto) {
-            mesa.quitarCarta(element);
+        destinatario.agregarBaza(baza);
+
+        for (Carta carta : resto) {
+            mesa.quitarCarta(carta);
         }
     }
+
 
     /**
      * Procesa la jugada del jugador actual, se gestiona tanto las bazas como las escobas.
