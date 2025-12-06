@@ -9,27 +9,36 @@ import escoba.modelo.excepcion.CartaNoEncontradaException;
 
 /**
  * Representa a un jugador del juego de la Escoba.
- * <p>Gestiona su nombre, la mano de cartas y las bazas ganadas.
- * Salvo error los arrays se manipulan sin utilizar clases del paquete {@code java.util}.</p>
+ * <p>
+ * Gestiona su nombre, la mano de cartas y las bazas ganadas a lo largo de la
+ * partida.
+ * </p>
  *
  * @author Ricardo Sevilla Soba
- * @version 1.2
- * @since 2025-10-24
+ * @version 2.0
+ * @since 2025-11-24
  */
 public class Jugador {
 
     /** Nombre del jugador. */
-    private String nombre;
+    private final String nombre;
 
     /** Cartas que el jugador tiene actualmente en su mano. */
-    private List<Carta> mano;
+    private final List<Carta> mano;
 
     /** Conjunto de bazas ganadas por el jugador. */
-    private List<Baza> bazas;
+    private final List<Baza> bazas;
 
-    /** Comparador de cartas. */
-    private Comparador<Carta> comparador;
+    /** Comparador de cartas asociado al jugador (puede ser {@code null}). */
+    private final Comparador<Carta> comparador;
 
+    /**
+     * Crea un nuevo jugador con el nombre indicado y un comparador asociado.
+     *
+     * @param nombre            nombre del jugador
+     * @param comparadorCartas  comparador de cartas asociado al jugador
+     * @throws IllegalArgumentException si el nombre o el comparador son nulos
+     */
     public Jugador(final String nombre, final Comparador<Carta> comparadorCartas) {
         if (nombre == null || comparadorCartas == null) {
             throw new IllegalArgumentException("Nombre o comparador nulos");
@@ -64,7 +73,6 @@ public class Jugador {
     /**
      * Devuelve una copia de las cartas que el jugador tiene en la mano.
      *
-     *
      * @return copia de la mano
      */
     public List<Carta> consultarMano() {
@@ -88,6 +96,7 @@ public class Jugador {
      * Añade una nueva baza ganada al jugador.
      *
      * @param baza baza que se va a agregar
+     * @throws IllegalArgumentException si la baza es {@code null}
      */
     public void agregarBaza(Baza baza) {
         if (baza == null) {
@@ -112,7 +121,7 @@ public class Jugador {
     }
 
     /**
-     * Cuenta el total de cartas ganadas, no de los puntos, si no de la cantidad total.
+     * Cuenta el total de cartas ganadas, no los puntos, sino la cantidad total.
      *
      * @return número total de cartas
      */
@@ -151,7 +160,7 @@ public class Jugador {
     }
 
     /**
-     * Nos informa si el jugador tiene el siete de oros.
+     * Informa si el jugador tiene el siete de oros.
      *
      * @return {@code true} si posee el siete de oros
      */
@@ -177,6 +186,8 @@ public class Jugador {
      * Añade una carta a la mano del jugador.
      *
      * @param carta carta a añadir
+     * @throws IllegalArgumentException si la carta es {@code null}
+     * @throws CartaExistenteException  si la carta ya está en la mano
      */
     public void recibirCarta(Carta carta) throws CartaExistenteException {
         if (carta == null) {
@@ -189,9 +200,12 @@ public class Jugador {
     }
 
     /**
-     * Elimina la carta jugada de la mano, el jugador seleeciona una para hacer baza o dejar en la mesa.
+     * Elimina la carta jugada de la mano. El jugador selecciona una para hacer
+     * baza o dejarla en la mesa.
      *
      * @param carta carta que se ha jugado
+     * @throws IllegalArgumentException   si la carta es {@code null}
+     * @throws CartaNoEncontradaException si la carta no está en la mano
      */
     public void jugarCarta(Carta carta) throws CartaNoEncontradaException {
         if (carta == null) {
@@ -236,37 +250,40 @@ public class Jugador {
         if (this == obj) {
             return true;
         }
+
+        boolean iguales = true;
+
         if (obj == null || getClass() != obj.getClass()) {
-            return false;
+            iguales = false;
+        } else {
+            Jugador otro = (Jugador) obj;
 
-        }
-        Jugador otro = (Jugador) obj;
-
-        if (nombre == null) {
-            if (otro.nombre != null) {
-                return false;
+            if (nombre == null) {
+                if (otro.nombre != null) {
+                    iguales = false;
+                }
+            } else if (!nombre.equals(otro.nombre)) {
+                iguales = false;
             }
 
-        } else if (!nombre.equals(otro.nombre)) {
-            return false;
-        }
+            if (iguales && (mano.size() != otro.mano.size() || bazas.size() != otro.bazas.size())) {
+                iguales = false;
+            }
 
-        if (mano.size() != otro.mano.size() || bazas.size() != otro.bazas.size()) {
-            return false;
-        }
+            for (int i = 0; iguales && i < mano.size(); i++) {
+                if (!mano.get(i).equals(otro.mano.get(i))) {
+                    iguales = false;
+                }
+            }
 
-        for (int i = 0; i < mano.size(); i++) {
-            if (!mano.get(i).equals(otro.mano.get(i))) {
-                return false;
+            for (int i = 0; iguales && i < bazas.size(); i++) {
+                if (!bazas.get(i).equals(otro.bazas.get(i))) {
+                    iguales = false;
+                }
             }
         }
 
-        for (int i = 0; i < bazas.size(); i++) {
-            if (!bazas.get(i).equals(otro.bazas.get(i))) {
-                return false;
-            }
-        }
-        return true;
+        return iguales;
     }
 
     /**

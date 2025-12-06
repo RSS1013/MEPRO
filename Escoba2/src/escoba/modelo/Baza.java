@@ -14,13 +14,13 @@ import escoba.modelo.excepcion.CartaExistenteException;
  *
  *
  * @author Ricardo Sevilla Soba
- * @version 1.2
- * @since 2025-10-24
+ * @version 2.0
+ * @since 2025-11-24
  */
 public class Baza {
 
     /** Cartas que forman parte de la baza. */
-    private List<Carta> cartas;
+    private final List<Carta> cartas;
 
     /** Indica si la baza fue conseguida como una escoba y queda la mesa vacía. */
     private boolean fueEscoba;
@@ -37,6 +37,8 @@ public class Baza {
      * Añade una carta a esta baza.
      *
      * @param carta la carta que se va a agregar a la baza
+     * @throws IllegalArgumentException si la carta es {@code null}
+     * @throws CartaExistenteException si la carta ya existe en la baza
      */
     public void agregarCarta(final Carta carta) throws CartaExistenteException {
         if (carta == null) {
@@ -65,7 +67,7 @@ public class Baza {
     /**
      * Devuelve las cartas contenidas en esta baza.
      *
-     * @return un nuevo array con las cartas de esta baza
+     * @return una nueva lista con las cartas de esta baza
      */
     public List<Carta> consultarCartas() {
         return new ArrayList<>(cartas);
@@ -157,19 +159,26 @@ public class Baza {
         if (this == obj) {
             return true;
         }
+
+        boolean iguales = true;
+
         if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Baza otra = (Baza) obj;
-        if (this.fueEscoba != otra.fueEscoba || this.cartas.size() != otra.cartas.size()) {
-            return false;
-        }
-        for (int i = 0; i < cartas.size(); i++) {
-            if (!this.cartas.get(i).equals(otra.cartas.get(i))) {
-                return false;
+            iguales = false;
+        } else {
+            Baza otra = (Baza) obj;
+
+            if (fueEscoba != otra.fueEscoba || cartas.size() != otra.cartas.size()) {
+                iguales = false;
+            }
+
+            for (int i = 0; iguales && i < cartas.size(); i++) {
+                if (!cartas.get(i).equals(otra.cartas.get(i))) {
+                    iguales = false;
+                }
             }
         }
-        return true;
+
+        return iguales;
     }
 
     /**

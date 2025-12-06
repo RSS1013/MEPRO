@@ -4,45 +4,60 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Comparador genérico para cartas (u otros tipos).
+ * Interfaz genérica que define los métodos necesarios para comparar y ordenar
+ * elementos dentro del juego de la Escoba.
+ * <p>
+ * Las implementaciones permiten aplicar diferentes criterios de
+ * comparación sobre las cartas, controlando también las estadísticas internas como el
+ * número de ordenaciones o intercambios realizados.
+ * </p>
+ *
+ * @param <T> tipo de elementos que este comparador es capaz de comparar
+ * 
+ * @author Ricardo Sevilla Soba
+ * @since 2025-11-24
+ * @version 2.0
  */
 public interface Comparador<T> {
 
     /**
-     * Compara dos elementos.
+     * Compara dos elementos del tipo {@code T}.
      *
      * @param primero primer elemento
      * @param segundo segundo elemento
-     * @return valor negativo si primero < segundo, cero si son iguales,
-     *         valor positivo si primero > segundo
+     * @return valor negativo si {@code primero < segundo}, cero si son iguales,
+     *         valor positivo si {@code primero > segundo}
      */
     int comparar(T primero, T segundo);
 
     /**
-     * Ordena en sitio la lista recibida usando este comparador.
+     * Ordena en su sitio la lista recibida siguiendo el criterio de comparación
+     * definido por esta implementación.
      *
      * @param lista lista a ordenar
+     * @throws IllegalArgumentException si la lista es {@code null}
      */
     void ordenar(List<T> lista);
 
     /**
-     * Devuelve el número de ordenaciones realizadas con este comparador.
+     * Devuelve el número total de ordenaciones realizadas mediante este comparador.
      *
-     * @return número de llamadas a {@link #ordenar(List)}
+     * @return número de llamadas al método {@link #ordenar(List)}
      */
     int consultarOrdenaciones();
 
     /**
-     * Devuelve el número de intercambios realizados en las ordenaciones.
+     * Devuelve el número total de intercambios efectuados durante las
+     * ordenaciones realizadas con este comparador.
      *
      * @return número de intercambios realizados
      */
     int consultarIntercambios();
 
     /**
-     * Devuelve la fecha de creación del comparador.
+     * Devuelve la fecha en la que este comparador fue creado.
      *
-     * @return fecha de creación
+     * @return fecha de creación del comparador
      */
     Date consultarFecha();
 }

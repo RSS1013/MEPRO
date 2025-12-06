@@ -3,8 +3,8 @@
  * Representan condiciones de error específicas como cartas duplicadas
  * o intentos de jugar cartas inexistentes.
  * 
- * @author 
+ * @author Ricardo Sevilla
  * @version 2.0
- * @since 2025-10-24
+ * @since 2025-11-24
  */
 package escoba.modelo.excepcion;

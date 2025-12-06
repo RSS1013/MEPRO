@@ -3,8 +3,8 @@
  * los parámetros de entrada proporcionados a la aplicación.
  * Provee instancias de las distintas implementaciones de comparador.
  * 
- * @author 
+ * @author Ricardo Sevilla
  * @version 2.0
- * @since 2025-10-24
+ * @since 2025-11-24
  */
 package escoba.fabrica;
